@@ -1,0 +1,1 @@
+from .landmark_detection import landmark_detection_namespace

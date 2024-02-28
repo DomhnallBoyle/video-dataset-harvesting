@@ -1,0 +1,10 @@
+data
+downloads
+.idea
+*__pycache__
+*.css.map
+*.pt
+*.pbmm
+*.pkl
+*.model
+*.dat

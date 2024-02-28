@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+{% block header %}Dashboard{% endblock %}
+{% block body %}
+    {% set videos = videos | list %}
+    {% set videos_length = videos | length %}
+
+    <h2>Stats:</h2>
+    <p>No. Videos: {{ videos_length }}</p>
+    <p>No. Manual Transcript videos: {{ manual_count }}</p>
+    <p>No. Auto Transcript videos: {{ videos_length - manual_count }}</p>
+    <p>No. Segments: {{ segment_count }}</p>
+    <p>No. Usable Segments: {{ usable_segment_count }}</p>
+    <p>Approx. Total Duration: {{ "%.2f" | format(total_duration) }} hrs</p>
+
+    {% if videos_length > 0 %}
+        <h2>Harvested Videos:</h2>
+        <div class="grid-container">
+            {% for video in videos %}
+            <div class="grid-item">
+                <a href="/videos/{{ video.id }}">
+                    <img src="{{ video.thumbnail_base64 | safe }}"/>
+                </a>
+                <p>No. Segments: {{ video.segments | length }}</p>
+                <p>No. People: {{ video.num_people }}</p>
+                <p>Transcript type: {{ video.transcript_type.name }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

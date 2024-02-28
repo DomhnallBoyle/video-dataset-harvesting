@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Video{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/video.css') }}">
+{% endblock %}
+{% block header %}Video: {{ video.id }}{% endblock %}
+{% block body %}
+    <video class="video" controls>
+        <source src="http://localhost:8001/data/{{ video.id }}/video.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <h2>Stats:</h2>
+    <p>URL: <a href="{{ video.url }}">link</a></p>
+    <p>No. Segments: {{ video.segments | length }}</p>
+    <p>No. People: {{ video.num_people }}</p>
+    <p>Transcript type: {{ video.transcript_type.name }}</p>
+
+    <h2>Local Identities:</h2>
+    {% for i in video.identity_list %}
+        {% if i == -1 %}
+            <p>Identity: Unconfirmed</p>
+        {% else %}
+            <p>Identity: {{ i }}</p>
+        {% endif %}
+        <div class="grid-container">
+            {% for segment in video.segments %}
+                {% if segment.local_identity == i %}
+                    {% set thumbnail = segment.thumbnail_base64 | safe %}
+                    {% if thumbnail != 'None' %}
+                        <div class="grid-item">
+                            <a href="/segments/{{ segment.id }}">
+                                <img src="data:image/jpeg;base64,{{ thumbnail }}"/>
+                            </a>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
+        <br><hr>
+    {% endfor %}
+{% endblock %}

@@ -1,0 +1,29 @@
+@use 'base';
+
+#body {
+    margin: 0;
+}
+
+#videos {
+    float: left;
+}
+
+#stats {
+    float: left;
+    margin-left: 5%;
+}
+
+#words {
+    float: left;
+    margin-left: 5%;
+}
+
+#words-inner {
+    overflow-y: scroll;
+    max-height: 100vh;
+}
+
+table {
+    border: 1px solid black;
+    text-align: center;
+}

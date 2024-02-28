@@ -1,0 +1,9 @@
+docker
+ffmpeg-python
+opencv-python
+pydub
+psycopg2
+requests
+sqlalchemy
+tqdm
+webvtt-py

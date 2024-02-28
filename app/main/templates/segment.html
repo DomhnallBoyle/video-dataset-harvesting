@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Video{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/segment.css') }}">
+{% endblock %}
+{% block header %}Segment: {{ segment.id }}{% endblock %}
+{% block body %}
+    <div id="videos">
+        <h2>Original Video:</h2>
+        <video class="video" controls>
+            <source src="http://localhost:8001/data/{{ segment.video.id }}/segments/{{ segment.id }}/combined.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+
+        <h2>Cropped Speaker:</h2>
+        <video class="video" controls>
+            <source src="http://localhost:8001/data/{{ segment.video.id }}/segments/{{ segment.id }}/cropped_speaker.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+
+        {% if segment.non_speaker_video_names %}
+            <h2>Non Speakers:</h2>
+            {% for video_name in segment.non_speaker_video_names %}
+                <video class="video" controls>
+                    <source src="http://localhost:8001/data/{{ segment.video.id }}/segments/{{ segment.id }}/{{ video_name }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video><br>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div id="stats">
+        <h2>Stats:</h2>
+        <h3>Transcript:</h3>
+        <p>"{{ segment.text }}"</p>
+
+        <h3>SyncNet:</h3>
+        {% if segment.sync_confidence %}
+            <p>Confidence: {{ "%.2f" | format(segment.sync_confidence) }}</p>
+        {% endif %}
+
+        <h3>ASR (Deep Speech):</h3>
+        <p>Transcript: "{{ segment.asr_text }}"</p>
+        {% if segment.asr_confidence %}
+            <p>Confidence: {{ "%.2f" | format(segment.asr_confidence) }}</p>
+        {% endif %}
+
+        <h3>Forced Alignment:</h3>
+        {% if segment.fa_log_likelihood %}
+            <p>Log Likelihood: {{ "%.2f" | format(segment.fa_log_likelihood) }}</p>
+        {% endif %}
+        {% if segment.fa_alignment %}
+            <p>Alignment:</p>
+            <table>
+                <tr>
+                    <th>Word</th>
+                    <th>Start (s)</th>
+                    <th>End (s)</th>
+                    <th>Duration (s)</th>
+                    <th>Log Likelihood</th>
+                </tr>
+                {% for alignment in segment.fa_alignment %}
+                <tr>
+                    <td>{{ alignment[0] }}</td>
+                    <td>{{ "%.2f" | format(alignment[1]) }}</td>
+                    <td>{{ "%.2f" | format(alignment[2]) }}</td>
+                    <td>{{ "%.2f" | format(alignment[2] - alignment[1]) }}</td>
+                    <td>{{ "%.2f" | format(alignment[3]) }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+
+        <h3>Direction:</h3>
+        <p>Pitch: {{ segment.pitch }}</p>
+        <p>Roll: {{ segment.roll }}</p>
+        <p>Yaw: {{ segment.yaw }}</p>
+        <p>Direction: {{ segment.direction.name }}</p>
+
+        <h3>Other:</h3>
+        <p>Local Identity: {{ segment.local_identity }}</p>
+        <p>Gender: {{ segment.gender.name }}</p>
+        <p>Age: {{ segment.age }}</p>
+    </div>
+
+    <div id="words">
+        <h2>Words:</h2>
+        {% if segment.words | length > 0 %}
+            <div id="words-inner">
+                {% for word in segment.words %}
+                    {{ word.text }} - {{ word.asr_text }}<br>
+                    <video class="video" controls>
+                        <source src="http://localhost:8001/data/{{ segment.video.id }}/segments/{{ segment.id }}/words/{{ word.id }}.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video><br><br>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>None</p>
+        {% endif %}
+    </div>
+{% endblock %}

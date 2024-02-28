@@ -1,0 +1,3 @@
+deepspeech-gpu==0.9.3
+Flask==1.1.4
+flask-restx==0.4.0

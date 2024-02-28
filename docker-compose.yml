@@ -1,0 +1,99 @@
+services:
+  db:
+    container_name: db
+    image: postgres:13-alpine
+    environment:
+      - POSTGRES_USER=${DATABASE_USER:-admin}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD:-password}
+      - POSTGRES_DB=${DATABASE_NAME:-dataset}
+    ports:
+      - '5432:5432'
+  video-scraper:
+    container_name: video-scraper
+    build:
+      args:
+        - 'PORT=8080'
+      context: app/main/services/video_scraper
+    image: liopa/video-scraper:latest
+    ports:
+      - '8080:8080'
+    volumes:
+      - /shared:/shared
+  speech-recognition:  # deep speech
+    container_name: speech-recognition
+    environment:
+      - EXTERNAL_SCORER_PATH=${EXTERNAL_SCORER_PATH}
+      - SCORER_ALPHA=${SCORER_ALPHA:-0.931289039105002}
+      - SCORER_BETA=${SCORER_BETA:-1.1834137581510284}
+    build:
+      args:
+        - 'PORT=8081'
+      context: app/main/services/speech_recognition
+    image: liopa/speech-recognition:latest
+    ports:
+      - '8081:8081'
+    runtime: nvidia
+    volumes:
+      - /shared:/shared
+  forced-alignment:  # audio/text synchronisation
+    container_name: forced-alignment
+    build:
+      args:
+        - 'PORT=8082'
+      context: app/main/services/forced_alignment
+    image: liopa/forced-alignment:latest
+    ports:
+      - '8082:8082'
+    volumes:
+      - /shared:/shared
+  face-detection:
+    container_name: face-detection
+    build:
+      args:
+        - 'PORT=8083'
+      context: app/main/services/face_detection
+    image: liopa/face-detection:latest
+    ports:
+      - '8083:8083'
+    runtime: nvidia
+    volumes:
+      - /shared:/shared
+  sync-net:  # audio/video synchronisation
+    container_name: sync-net
+    build:
+      args:
+        - 'PORT=8084'
+      context: app/main/services/sync_net
+    image: liopa/sync-net:latest
+    ports:
+      - '8084:8084'
+    runtime: nvidia
+    volumes:
+      - /shared:/shared
+  hope-net:  # pose estimation
+    container_name: hope-net
+    environment:
+      - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
+    build:
+      args:
+        - 'PORT=8085'
+      context: app/main/services/hope_net
+    image: liopa/hope-net:latest
+    ports:
+      - '8085:8085'
+    runtime: nvidia
+    volumes:
+      - /shared:/shared
+  face-net:  # face recognition embeddings
+    container_name: face-net
+    build:
+      args:
+        - 'PORT=8086'
+      context: app/main/services/face_net
+    image: liopa/face-net:latest
+    ports:
+      - '8086:8086'
+    runtime: nvidia
+    volumes:
+      - /shared:/shared
+version: '2.3'
